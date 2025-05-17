@@ -1,0 +1,7 @@
+#!/usr/bin/env bash
+
+git add -A
+MODIFIED=$(git status | grep 'modified:' | wc -l)
+NEW=$(git status | grep 'new file:' | wc -l)
+
+git commit -am "MODIFIED $MODIFIED, NEW $NEW"
