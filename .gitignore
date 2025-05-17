@@ -1,3 +1,6 @@
 # Vim {{{1
 .*.sw?
 *.session
+
+# Misc {{{1
+make.log
