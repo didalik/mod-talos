@@ -1,3 +1,6 @@
 [submodule "talos"]
 	path = talos
 	url = https://github.com/siderolabs/talos.git
+[submodule "dak.org.hub"]
+	path = dak.org.hub
+	url = git@github.com:didalik/dak.org.hub.git
