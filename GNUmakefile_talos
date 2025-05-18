@@ -25,7 +25,7 @@ installer: ## Builds the installer and outputs it to the artifact directory.
 	@$(MAKE) image-installer IMAGER_ARGS="--base-installer-image $(REGISTRY_AND_USERNAME)/installer-base:$(TAG)"
 
 %: force
-	@echo '<<< delegating' $@ '...'
+	@echo '<<< delegating' $@ '...';var='$@';[ -z "$${var##target-*}" ] && echo 'TARGET_ARGS' $(TARGET_ARGS) || echo
 	@$(MAKE) -f Makefile $@ PLATFORM=${PLATFORM} SHA=${SHA} TAG=${TAG}
 force: ;
 
