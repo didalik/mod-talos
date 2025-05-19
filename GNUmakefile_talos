@@ -1,4 +1,4 @@
-ARCH != [ "$$(arch)" = 'aarch64' ] && echo arm64 || arch
+ARCH != [ "$$(arch)" = 'aarch64' ] && echo arm64 || echo amd64
 CILIUM_CLI_VERSION ?= v0.18.3
 HELM_VERSION ?= v3.17.3
 KUBECTL_VERSION ?= v1.33.1
@@ -17,7 +17,7 @@ PLATFORM ?= linux/$(ARCH)
 REGISTRY_AND_USERNAME := $(REGISTRY)/$(USERNAME)
 
 .PHONY: all
-all: initramfs kernel installer imager talosctl talos
+all: initramfs kernel installer imager talosctl talos unit-tests
 
 .PHONY: installer
 installer: ## Builds the installer and outputs it to the artifact directory.
