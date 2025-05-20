@@ -1,5 +1,23 @@
 # TODOs
 
+## Set up the VM
+
+On my MacBook Air M1 (RAM 8Gb, SSD 256Gb) with UTM, I create QEMU 7.2 Virtual Machine:
+
+- Name: `mt`,
+- Size: 192Gb,
+- Network Mode: Bridged (Advanced),
+- QEMU: Use local time for base clock,
+- Image: ubuntu-24.04.2-live-server-arm64.iso
+
+When configuring OpenSSH for `alik`, I add my GitHub PKs to `~/.ssh/authorized_keys`.
+
+Having SSHed to `alik@mt`, I run
+
+```
+echo "alik  ALL=(ALL) NOPASSWD:ALL" | sudo tee /etc/sudoers.d/alik
+```
+
 ## Add script `bin/setup-root4dev`
 
 From `alik`'s and `root`'s histories:
