@@ -29,8 +29,8 @@ run () { # {{{1
 
 validate () { # {{{1
 	echo "validate $# $@"
-  [ "$(uname)" = 'Linux ] || {
-    echo -e "\n\tERROR: invalid uname; expected 'Linux', got '$(uname)'\n"; return 1
+  [ "$(uname)" = 'Linux' ] || {
+    echo -e "\n\tERROR: invalid uname: expected 'Linux', got '$(uname)'\n"; return 1
   }
   [ -z "$SSH_CLIENT" ] || echo SSH_CLIENT $SSH_CLIENT
 }
