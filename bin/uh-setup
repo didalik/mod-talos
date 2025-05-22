@@ -1,0 +1,37 @@
+#!/bin/bash
+#
+# Setup for $USER@$HOSTNAME
+##
+
+NODE_VERSION=20
+NVM_VERSION=v0.40.3
+
+help () { # {{{1
+	echo "help $# $@"
+}
+
+install_node () { # {{{1
+  which node && return
+  [ -e $HOME/.bashrc.uh.saved ] && mv $HOME/.bashrc.uh.saved $HOME/.bashrc && rm -rf $HOME/.nvm # debug/teardown
+  cp $HOME/.bashrc $HOME/.bashrc.uh.saved
+  curl -o- https://raw.githubusercontent.com/nvm-sh/nvm/$NVM_VERSION/install.sh | bash
+  export NVM_DIR="$HOME/.nvm"
+  [ -s "$NVM_DIR/nvm.sh" ] && \. "$NVM_DIR/nvm.sh"  # This loads nvm
+  [ -s "$NVM_DIR/bash_completion" ] && \. "$NVM_DIR/bash_completion"  # This loads nvm bash_completion
+  nvm install $NODE_VERSION
+  nvm use $NODE_VERSION
+}
+
+run () { # {{{1
+	echo "run $# $@"
+  install_node
+}
+
+validate () { # {{{1
+	echo "validate $# $@"
+  [ -z "$SSH_CLIENT" ] || echo SSH_CLIENT $SSH_CLIENT
+}
+
+echo "$0 started for $USER on $(date) in $PWD" # {{{1
+validate $@ && run $@ || help $@
+echo "$0 DONE"

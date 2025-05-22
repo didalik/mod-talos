@@ -1,8 +1,0 @@
-#!/bin/bash
-
-. $1
-
-cd $HOME
-echo "$0 started for $USER on $(date) in $PWD"
-[ -z "S(grep "XA$SSH_CLIENT" .ssh/authorized_keys)" ] && echo "SSH_CLIENT $SSH_CLIENT NOT found" || echo "SSH_CLIENT $SSH_CLIENT found"
-echo "$0 DONE"
