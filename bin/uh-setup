@@ -22,9 +22,63 @@ install_node () { # {{{1
   nvm use $NODE_VERSION
 }
 
+install_vim_plugins () { # {{{1
+  [ -d $HOME/.vim/autoload ] && return
+  [ -e $HOME/.vimrc.uh.saved ] && mv $HOME/.vimrc.uh.saved $HOME/.vimrc && rm -rf $HOME/.vim/autoload # debug/teardown
+  cp $HOME/.vimrc $HOME/.vimrc.uh.saved
+  cat << HD > $HOME/.vimrc # {{{2
+syntax on
+filetype plugin indent on
+
+set number
+set tabstop=2     " show existing tab with 2 spaces width
+set shiftwidth=2  " when indenting with '>', use 2 spaces width
+set expandtab     " on pressing tab, insert 2 spaces
+set updatecount=0 " the writing to the swap file is not wanted
+set backspace=indent,eol,start
+set foldmethod=marker
+set mouse-=a
+
+" To make Vim insert a literal tab character when you press <S-Tab>:
+inoremap <S-Tab> <C-V><Tab>
+" Like this t2  t3 - this line holds 3 tabs
+
+colorscheme default
+
+" See also:
+" - https://superuser.com/questions/768894/mapping-s-tab-in-vim
+" - https://github.com/amix/vimrc.git
+""
+
+let data_dir = has('nvim') ? stdpath('data') . '/site' : '~/.vim'
+if empty(glob(data_dir . '/autoload/plug.vim'))
+  silent execute '!curl -fLo '.data_dir.'/autoload/plug.vim --create-dirs  https://raw.githubusercontent.com/junegunn/vim-plug/master/plug.vim'
+  autocmd VimEnter * PlugInstall --sync | source $MYVIMRC
+endif
+
+call plug#begin()
+
+  Plug 'fatih/vim-go', { 'do': ':GoUpdateBinaries' }
+  Plug 'augmentcode/augment.vim'
+
+call plug#end()
+
+let g:augment_workspace_folders = ['/home/alik/dak.org.hub', '/home/alik/people/didalik']
+" See also:
+" https://github.com/junegunn/vim-plug/wiki/tips#automatic-installation
+" https://github.com/junegunn/vim-plug?tab=readme-ov-file
+" https://github.com/fatih/vim-go?tab=readme-ov-file
+" https://github.com/augmentcode/augment.vim
+""
+HD
+# }}}2
+  echo 'install_vim_plugins: DONE, please restart open vim sessions!'
+}
+
 run () { # {{{1
 	echo "run $# $@"
   install_node
+  install_vim_plugins
 }
 
 validate () { # {{{1
