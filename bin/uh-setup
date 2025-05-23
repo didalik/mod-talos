@@ -1,6 +1,6 @@
 #!/bin/bash
 #
-# Setup for $USER@$HOSTNAME
+# Setup for $USER@$HOSTNAME - both sudoer and root
 ##
 
 NODE_VERSION=20
@@ -20,12 +20,25 @@ install_node () { # {{{1
   [ -s "$NVM_DIR/bash_completion" ] && \. "$NVM_DIR/bash_completion"  # This loads nvm bash_completion
   nvm install $NODE_VERSION
   nvm use $NODE_VERSION
+  [ -e /usr/local/bin/node ] || sudo ln $HOME/.nvm/versions/node/$NODE_VERSION/bin/node /usr/local/bin/node
 }
 
-install_vim_plugins () { # {{{1
+run () { # {{{1
+	echo "run $# $@"
+  install_node
+  setup_vim
+  if [ "$USER" = 'root' ]; then
+    which node
+  else
+    [ -z "$(sudo -u root cat /root/.ssh/authorized_keys)" ] && sudo cp $HOME/.ssh/authorized_keys /root/.ssh || echo '/root/.ssh/authorized_keys preserved'
+    sudo -u root $0
+  fi
+}
+
+setup_vim () { # {{{1
   [ -d $HOME/.vim/autoload ] && return
   [ -e $HOME/.vimrc.uh.saved ] && mv $HOME/.vimrc.uh.saved $HOME/.vimrc && rm -rf $HOME/.vim/autoload # debug/teardown
-  cp $HOME/.vimrc $HOME/.vimrc.uh.saved
+  [ -e $HOME/.vimrc ] && cp $HOME/.vimrc $HOME/.vimrc.uh.saved || touch $HOME/.vimrc.uh.saved
   cat << HD > $HOME/.vimrc # {{{2
 syntax on
 filetype plugin indent on
@@ -63,7 +76,7 @@ call plug#begin()
 
 call plug#end()
 
-let g:augment_workspace_folders = ['/home/alik/dak.org.hub', '/home/alik/people/didalik']
+let g:augment_workspace_folders = ['$HOME/people/didalik']
 " See also:
 " https://github.com/junegunn/vim-plug/wiki/tips#automatic-installation
 " https://github.com/junegunn/vim-plug?tab=readme-ov-file
@@ -72,13 +85,7 @@ let g:augment_workspace_folders = ['/home/alik/dak.org.hub', '/home/alik/people/
 ""
 HD
 # }}}2
-  echo 'install_vim_plugins: DONE, please restart open vim sessions!'
-}
-
-run () { # {{{1
-	echo "run $# $@"
-  install_node
-  install_vim_plugins
+  echo -e "\n\tsetup_vim: DONE for $USER, please restart open vim sessions!\n"
 }
 
 validate () { # {{{1
@@ -86,9 +93,10 @@ validate () { # {{{1
   [ "$(uname)" = 'Linux' ] || {
     echo -e "\n\tERROR: invalid uname: expected 'Linux', got '$(uname)'\n"; return 1
   }
+  [ "$USER" = 'root' ] || [ -e /etc/sudoers.d/$USER ] || echo "$USER  ALL=(ALL) NOPASSWD:ALL" | sudo tee /etc/sudoers.d/$USER
   [ -z "$SSH_CLIENT" ] || echo SSH_CLIENT $SSH_CLIENT
 }
 
 echo "$0 started for $USER on $(date) in $PWD" # {{{1
 validate $@ && run $@ || help $@
-echo "$0 DONE"
+echo "$0 DONE for $USER"
