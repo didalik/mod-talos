@@ -28,9 +28,13 @@ run () { # {{{1
   install_node
   setup_vim
   if [ "$USER" = 'root' ]; then
-    which node
+    [ -d $HOME/people/didalik/mod-talos ] && return || echo 'Cloning mod-talos...'
+    mkdir -p $HOME/people/didalik
+    cd $HOME/people/didalik
+    git clone --recurse-submodules git@github.com:didalik/mod-talos.git
   else
     [ -z "$(sudo -u root cat /root/.ssh/authorized_keys)" ] && sudo cp $HOME/.ssh/authorized_keys /root/.ssh || echo '/root/.ssh/authorized_keys preserved'
+    sudo [ -e /root/.ssh/id_ed25519 ] && echo 'root SSH identity preserved' || sudo cp $HOME/.ssh/id_ed25519* /root/.ssh
     sudo -u root $0
   fi
 }
