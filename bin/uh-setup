@@ -12,6 +12,15 @@ help () { # {{{1
 	echo "help $# $@"
 }
 
+install_docker () { # {{{1
+  [ -e "$HOME/get-docker.sh" ] && echo "file $HOME/get-docker.sh found" && return
+  echo "file $HOME/get-docker.sh NOT found, installing Docker Engine..."
+  cd $HOME
+  curl -fsSL https://get.docker.com -o get-docker.sh
+  sh get-docker.sh
+  cd -
+}
+
 install_go () { # {{{1
   . /etc/profile
   which go && return
@@ -42,6 +51,7 @@ run () { # {{{1
   if [ "$USER" = 'root' ]; then
     mkdir -p $HOME/people/didalik
     cd $HOME/people/didalik
+    install_docker
     install_go
     [ -d $HOME/people/didalik/mod-talos ] && return || echo 'Cloning mod-talos...'
     git clone --recurse-submodules git@github.com:didalik/mod-talos.git
