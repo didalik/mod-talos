@@ -3,11 +3,23 @@
 # Setup for $USER@$HOSTNAME - both sudoer and root
 ##
 
+ARCH=$([ "$(arch)" = 'aarch64' ] && echo 'arm64' || echo 'amd64')
+GO_VERSION=1.24.3
 NODE_VERSION=20
 NVM_VERSION=v0.40.3
 
 help () { # {{{1
 	echo "help $# $@"
+}
+
+install_go () { # {{{1
+  . /etc/profile
+  which go && return
+  curl -OL https://go.dev/dl/go$GO_VERSION.linux-$ARCH.tar.gz
+  rm -rf /usr/local/go && tar -C /usr/local -xzf go$GO_VERSION.linux-$ARCH.tar.gz && rm go$GO_VERSION.linux-$ARCH.tar.gz
+  echo 'export PATH=$PATH:/usr/local/go/bin' > /etc/profile.d/gopath.sh
+  . /etc/profile
+  go version
 }
 
 install_node () { # {{{1
@@ -28,9 +40,10 @@ run () { # {{{1
   install_node
   setup_vim
   if [ "$USER" = 'root' ]; then
-    [ -d $HOME/people/didalik/mod-talos ] && return || echo 'Cloning mod-talos...'
     mkdir -p $HOME/people/didalik
     cd $HOME/people/didalik
+    install_go
+    [ -d $HOME/people/didalik/mod-talos ] && return || echo 'Cloning mod-talos...'
     git clone --recurse-submodules git@github.com:didalik/mod-talos.git
   else
     [ -z "$(sudo -u root cat /root/.ssh/authorized_keys)" ] && sudo cp $HOME/.ssh/authorized_keys /root/.ssh || echo '/root/.ssh/authorized_keys preserved'
