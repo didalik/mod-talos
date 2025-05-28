@@ -1,5 +1,15 @@
+ARCH != [ "$$(arch)" = 'aarch64' ] && echo arm64 || echo amd64
 ARTIFACTS ?= _out
+PLATFORM ?= linux/$(ARCH)
 
 .PHONY: initramfs
-initramfs: ## Builds the compressed initramfs and outputs it to the artifact directory.
+initramfs: ## Build the compressed initramfs and output it to $(ARTIFACTS).
 	@$(MAKE) local-$@ DEST=$(ARTIFACTS) PUSH=false
+
+local-%: ## Build the specified target defined in the Dockerfile using the local output type. Output the build result to $(DEST).
+	@$(MAKE) target-$* TARGET_ARGS="--output=type=local,dest=$(DEST)"
+	@PLATFORM=$(PLATFORM) ARTIFACTS=$(ARTIFACTS) ./hack/fix-artifacts.sh
+
+target-%: ## Build the specified target defined in the Dockerfile. The build result will only remain in the build cache.
+	@docker buildx build --target=$* $(COMMON_ARGS) $(TARGET_ARGS) $(CI_ARGS) .
+

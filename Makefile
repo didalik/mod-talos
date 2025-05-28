@@ -27,6 +27,7 @@ sb: clean sandbox ## Reset the sandbox and run make there.
 sandbox: ## Init the sandbox.
 	@mkdir sandbox
 	@cp Makefile_sandbox sandbox/Makefile
+	@cp Dockerfile_sandbox sandbox/Dockerfile
 
 .PHONY: clean
 clean: ## Clean up the sandbox.
