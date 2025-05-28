@@ -2,7 +2,7 @@
 
 # Meta args applied to stage base names.
 
-ARG TOOLS=scratch
+ARG TOOLS=scratch # {{{1
 ARG PKGS=scratch
 ARG INSTALLER_ARCH=scratch
 ARG DEBUG_TOOLS_SOURCE=scratch
@@ -66,7 +66,7 @@ ARG DEBUG_TOOLS_SOURCE=scratch
 
 ARG EMBED_TARGET=embed
 
-# Resolve package images using ${PKGS} to be used later in COPY --from=.
+# Resolve package images using ${PKGS} to be used later in COPY --from=. {{{1
 
 FROM ${PKG_FHS} AS pkg-fhs
 FROM ${PKG_CA_CERTIFICATES} AS pkg-ca-certificates
@@ -223,7 +223,7 @@ COPY --from=tools-arm64 /usr/bin/tee /bin/tee
 FROM pkg-debug-tools-${DEBUG_TOOLS_SOURCE}-amd64 AS pkg-debug-tools-amd64
 FROM pkg-debug-tools-${DEBUG_TOOLS_SOURCE}-arm64 AS pkg-debug-tools-arm64
 
-# Strip CNI package.
+# Strip CNI package. {{{1
 
 FROM scratch AS pkg-cni-stripped-amd64
 COPY --from=pkg-cni-amd64 /opt/cni/bin/bridge /opt/cni/bin/bridge
@@ -241,62 +241,62 @@ COPY --from=pkg-cni-arm64 /opt/cni/bin/portmap /opt/cni/bin/portmap
 
 FROM ${PKG_TALOSCTL_CNI_BUNDLE} AS pkgs-talosctl-cni-bundle
 
-# The tools target provides base toolchain for the build.
+# The tools target provides base toolchain for the build. {{{1
 
 FROM --platform=${BUILDPLATFORM} ${TOOLS_PREFIX}:${TOOLS} AS tools
 ENV GOTOOLCHAIN=local
 ENV CGO_ENABLED=0
 SHELL ["/bin/bash", "-c"]
-ARG GOLANGCILINT_VERSION
+ARG GOLANGCILINT_VERSION # {{{2
 RUN --mount=type=cache,target=/.cache,id=talos/.cache go install github.com/golangci/golangci-lint/v2/cmd/golangci-lint@${GOLANGCILINT_VERSION} \
 	&& mv /root/go/bin/golangci-lint /usr/bin/golangci-lint
-ARG GOIMPORTS_VERSION
+ARG GOIMPORTS_VERSION # {{{2
 RUN --mount=type=cache,target=/.cache,id=talos/.cache go install golang.org/x/tools/cmd/goimports@${GOIMPORTS_VERSION} \
     && mv /root/go/bin/goimports /usr/bin/goimports
-ARG GOFUMPT_VERSION
+ARG GOFUMPT_VERSION # {{{2
 RUN --mount=type=cache,target=/.cache,id=talos/.cache go install mvdan.cc/gofumpt@${GOFUMPT_VERSION} \
     && mv /root/go/bin/gofumpt /usr/bin/gofumpt
-ARG DEEPCOPY_VERSION
+ARG DEEPCOPY_VERSION # {{{2
 RUN --mount=type=cache,target=/.cache,id=talos/.cache go install github.com/siderolabs/deep-copy@${DEEPCOPY_VERSION} \
     && mv /root/go/bin/deep-copy /usr/bin/deep-copy
-ARG STRINGER_VERSION
+ARG STRINGER_VERSION # {{{2
 RUN --mount=type=cache,target=/.cache,id=talos/.cache go install golang.org/x/tools/cmd/stringer@${STRINGER_VERSION} \
     && mv /root/go/bin/stringer /usr/bin/stringer
-ARG ENUMER_VERSION
+ARG ENUMER_VERSION # {{{2
 RUN --mount=type=cache,target=/.cache,id=talos/.cache go install github.com/dmarkham/enumer@${ENUMER_VERSION} \
     && mv /root/go/bin/enumer /usr/bin/enumer
-ARG DEEPCOPY_GEN_VERSION
+ARG DEEPCOPY_GEN_VERSION # {{{2
 RUN --mount=type=cache,target=/.cache,id=talos/.cache go install k8s.io/code-generator/cmd/deepcopy-gen@${DEEPCOPY_GEN_VERSION} \
     && mv /root/go/bin/deepcopy-gen /usr/bin/deepcopy-gen
-ARG VTPROTOBUF_VERSION
+ARG VTPROTOBUF_VERSION # {{{2
 RUN --mount=type=cache,target=/.cache,id=talos/.cache go install github.com/planetscale/vtprotobuf/cmd/protoc-gen-go-vtproto@${VTPROTOBUF_VERSION} \
     && mv /root/go/bin/protoc-gen-go-vtproto /usr/bin/protoc-gen-go-vtproto
-ARG IMPORTVET_VERSION
+ARG IMPORTVET_VERSION # {{{2
 RUN --mount=type=cache,target=/.cache,id=talos/.cache go install github.com/siderolabs/importvet/cmd/importvet@${IMPORTVET_VERSION} \
     && mv /root/go/bin/importvet /usr/bin/importvet
 RUN --mount=type=cache,target=/.cache,id=talos/.cache go install golang.org/x/vuln/cmd/govulncheck@latest \
     && mv /root/go/bin/govulncheck /usr/bin/govulncheck
-ARG PROTOTOOL_VERSION
+ARG PROTOTOOL_VERSION # {{{2
 RUN --mount=type=cache,target=/.cache,id=talos/.cache go install github.com/uber/prototool/cmd/prototool@${PROTOTOOL_VERSION} \
     && mv /root/go/bin/prototool /usr/bin/prototool
-ARG PROTOC_GEN_DOC_VERSION
+ARG PROTOC_GEN_DOC_VERSION # {{{2
 RUN --mount=type=cache,target=/.cache,id=talos/.cache go install github.com/pseudomuto/protoc-gen-doc/cmd/protoc-gen-doc@${PROTOC_GEN_DOC_VERSION} \
     && mv /root/go/bin/protoc-gen-doc /usr/bin/protoc-gen-doc
-COPY ./hack/docgen /go/src/github.com/siderolabs/talos-hack-docgen
+COPY ./hack/docgen /go/src/github.com/siderolabs/talos-hack-docgen # {{{2
 RUN --mount=type=cache,target=/.cache,id=talos/.cache cd /go/src/github.com/siderolabs/talos-hack-docgen \
     && go build -o docgen . \
     && mv docgen /usr/bin/
-COPY ./hack/gotagsrewrite /go/src/github.com/siderolabs/gotagsrewrite
+COPY ./hack/gotagsrewrite /go/src/github.com/siderolabs/gotagsrewrite # {{{2
 RUN --mount=type=cache,target=/.cache,id=talos/.cache cd /go/src/github.com/siderolabs/gotagsrewrite \
     && go build -o gotagsrewrite . \
     && mv gotagsrewrite /usr/bin/
-COPY ./hack/structprotogen /go/src/github.com/siderolabs/structprotogen
+COPY ./hack/structprotogen /go/src/github.com/siderolabs/structprotogen # {{{2
 RUN --mount=type=cache,target=/.cache,id=talos/.cache cd /go/src/github.com/siderolabs/structprotogen \
     && go build -o structprotogen . \
     && mv structprotogen /usr/bin/
+# }}}2
 
-# The build target creates a container that will be used to build Talos source
-# code.
+# The build target creates a container that will be used to build Talos source code. {{{1
 
 FROM --platform=${BUILDPLATFORM} tools AS build
 SHELL ["/bin/bash", "-c"]
@@ -311,7 +311,7 @@ ARG SOURCE_DATE_EPOCH
 ENV SOURCE_DATE_EPOCH=${SOURCE_DATE_EPOCH}
 WORKDIR /src
 
-# The build-go target creates a container to build Go code with Go modules downloaded and verified.
+# The build-go target creates a container to build Go code with Go modules downloaded and verified. {{{1
 
 FROM build AS build-go
 COPY ./go.mod ./go.sum ./
@@ -322,7 +322,7 @@ WORKDIR /src
 RUN --mount=type=cache,target=/.cache,id=talos/.cache go mod download
 RUN --mount=type=cache,target=/.cache,id=talos/.cache go mod verify
 
-# The generate target generates code from protobuf service definitions and machinery config.
+# The embed-generate target generates code from protobuf service definitions and machinery config. {{{1
 
 FROM build AS embed-generate
 ARG NAME
@@ -343,10 +343,10 @@ RUN mkdir -p pkg/machinery/gendata/data && \
     echo -n ${TAG} > pkg/machinery/gendata/data/tag && \
     echo -n ${ARTIFACTS} > pkg/machinery/gendata/data/artifacts
 
-FROM scratch AS embed
+FROM scratch AS embed # {{{1
 COPY --from=embed-generate /src/pkg/machinery/gendata/data /pkg/machinery/gendata/data
 
-FROM embed-generate AS embed-abbrev-generate
+FROM embed-generate AS embed-abbrev-generate # {{{1
 ARG ABBREV_TAG
 RUN echo -n "undefined" > pkg/machinery/gendata/data/sha && \
     echo -n ${ABBREV_TAG} > pkg/machinery/gendata/data/tag
@@ -355,13 +355,13 @@ RUN mkdir -p _out && \
     echo TOOLS=${TOOLS} >> _out/talos-metadata && \
     echo TAG=${TAG} >> _out/talos-metadata
 
-FROM scratch AS embed-abbrev
+FROM scratch AS embed-abbrev # {{{1
 COPY --from=embed-abbrev-generate /src/pkg/machinery/gendata/data /pkg/machinery/gendata/data
 COPY --from=embed-abbrev-generate /src/_out/talos-metadata /_out/talos-metadata
 
 FROM ${EMBED_TARGET} AS embed-target
 
-# generate API descriptors
+# generate API descriptors # {{{1
 FROM build AS api-descriptors-build
 WORKDIR /src/api
 COPY api .
@@ -371,7 +371,7 @@ RUN --mount=type=cache,target=/.cache,id=talos/.cache prototool break descriptor
 FROM --platform=${BUILDPLATFORM} scratch AS api-descriptors
 COPY --from=api-descriptors-build /src/api/api.descriptors /api/api.descriptors
 
-# format protobuf service definitions
+# format protobuf service definitions # {{{1
 FROM build AS proto-format-build
 WORKDIR /src/api
 COPY api .
@@ -380,7 +380,7 @@ RUN --mount=type=cache,target=/.cache,id=talos/.cache prototool format --overwri
 FROM --platform=${BUILDPLATFORM} scratch AS fmt-protobuf
 COPY --from=proto-format-build /src/api/ /api/
 
-# run docgen for machinery config
+# run docgen for machinery config # {{{1
 FROM build-go AS go-generate
 COPY ./pkg ./pkg
 COPY ./hack/boilerplate.txt ./hack/boilerplate.txt
@@ -398,7 +398,7 @@ FROM go-generate AS gen-proto-go
 WORKDIR /src/
 RUN --mount=type=cache,target=/.cache,id=talos/.cache structprotogen github.com/siderolabs/talos/pkg/machinery/... /api/resource/definitions/
 
-# compile protobuf service definitions
+# compile protobuf service definitions # {{{1
 FROM build AS generate-build
 COPY --from=proto-format-build /src/api /api/
 # Common needs to be at or near the top to satisfy the subsequent imports
@@ -427,29 +427,29 @@ RUN find /api/resource/definitions/ -type f -name "*.proto" | xargs -I {} /bin/b
 RUN goimports -w -local github.com/siderolabs/talos /api/
 RUN gofumpt -w /api/
 
-FROM tools AS selinux
+FROM tools AS selinux # {{{1
 COPY ./internal/pkg/selinux/policy/* /selinux/
 RUN mkdir /policy; secilc -o /policy/policy.33 -f /policy/file_contexts -c 33 /selinux/**/*.cil -vvvvv -O
 
-FROM scratch AS selinux-generate
+FROM scratch AS selinux-generate # {{{1
 COPY --from=selinux /policy /policy
 
-FROM scratch AS ipxe-generate
+FROM scratch AS ipxe-generate # {{{1
 COPY --from=pkg-ipxe-amd64 /usr/libexec/snp.efi /amd64/snp.efi
 COPY --from=pkg-ipxe-arm64 /usr/libexec/snp.efi /arm64/snp.efi
 
-FROM scratch AS microsoft-secureboot-database
+FROM scratch AS microsoft-secureboot-database # {{{1
 ARG MICROSOFT_SECUREBOOT_RELEASE
 ADD https://github.com/microsoft/secureboot_objects.git#${MICROSOFT_SECUREBOOT_RELEASE}:PreSignedObjects /
 
-FROM scratch AS microsoft-key-keys
+FROM scratch AS microsoft-key-keys # {{{1
 COPY --from=microsoft-secureboot-database /KEK/Certificates/*.der /kek/
 
-FROM scratch AS microsoft-db-keys
+FROM scratch AS microsoft-db-keys # {{{1
 COPY --from=microsoft-secureboot-database /DB/Certificates/MicCor*.der /db/
 COPY --from=microsoft-secureboot-database /DB/Certificates/microsoft*.der /db/
 
-FROM --platform=${BUILDPLATFORM} scratch AS generate
+FROM --platform=${BUILDPLATFORM} scratch AS generate # {{{1
 COPY --from=proto-format-build /src/api /api/
 COPY --from=generate-build /api/common/*.pb.go /pkg/machinery/api/common/
 COPY --from=generate-build /api/resource/definitions/ /api/resource/definitions/
@@ -478,8 +478,7 @@ COPY --from=pkg-ca-certificates /etc/ssl/certs/ca-certificates /internal/app/mac
 COPY --from=microsoft-key-keys / /internal/pkg/secureboot/database/certs/
 COPY --from=microsoft-db-keys / /internal/pkg/secureboot/database/certs/
 
-# The base target provides a container that can be used to build all Talos
-# assets.
+# The base target provides a container that can be used to build all Talos assets. # {{{1
 
 FROM build-go AS base
 COPY ./cmd ./cmd
@@ -492,12 +491,12 @@ RUN --mount=type=cache,target=/.cache,id=talos/.cache go list all >/dev/null
 RUN --mount=type=cache,target=/.cache,id=talos/.cache go generate -v ./version
 WORKDIR /src
 
-# The vulncheck target runs the vulnerability check tool.
+# The lint-vulncheck target runs the vulnerability check tool. # {{{1
 
 FROM base AS lint-vulncheck
 RUN --mount=type=cache,target=/.cache,id=talos/.cache govulncheck ./...
 
-# The init target builds the init binary.
+# The init target builds the init binary. # {{{1
 
 FROM base AS init-build-amd64
 WORKDIR /src/internal/app/init
@@ -518,7 +517,7 @@ FROM init-build-${TARGETARCH} AS init-build
 FROM scratch AS init
 COPY --from=init-build /init /init
 
-# The machined target builds the machined binary.
+# The machined target builds the machined binary. # {{{1
 
 FROM base AS machined-build-amd64
 WORKDIR /src/internal/app/machined
@@ -540,9 +539,9 @@ FROM machined-build-${TARGETARCH} AS machined-build
 FROM scratch AS machined
 COPY --from=machined-build /machined /machined
 
-# The talosctl targets build the talosctl binaries.
+# The talosctl targets build the talosctl binaries. # {{{1
 
-FROM base AS talosctl-linux-amd64-build
+FROM base AS talosctl-linux-amd64-build # {{{2
 WORKDIR /src/cmd/talosctl
 ARG GO_BUILDFLAGS_TALOSCTL
 ARG GO_LDFLAGS
@@ -551,7 +550,7 @@ RUN --mount=type=cache,target=/.cache,id=talos/.cache GOOS=linux GOARCH=amd64 GO
 RUN chmod +x /talosctl-linux-amd64
 RUN touch --date="@${SOURCE_DATE_EPOCH}" /talosctl-linux-amd64
 
-FROM base AS talosctl-linux-arm64-build
+FROM base AS talosctl-linux-arm64-build # {{{2
 WORKDIR /src/cmd/talosctl
 ARG GO_BUILDFLAGS_TALOSCTL
 ARG GO_LDFLAGS
@@ -559,7 +558,7 @@ RUN --mount=type=cache,target=/.cache,id=talos/.cache GOOS=linux GOARCH=arm64 go
 RUN chmod +x /talosctl-linux-arm64
 RUN touch --date="@${SOURCE_DATE_EPOCH}" /talosctl-linux-arm64
 
-FROM base AS talosctl-linux-armv7-build
+FROM base AS talosctl-linux-armv7-build # {{{2
 WORKDIR /src/cmd/talosctl
 ARG GO_BUILDFLAGS_TALOSCTL
 ARG GO_LDFLAGS
@@ -567,7 +566,7 @@ RUN --mount=type=cache,target=/.cache,id=talos/.cache GOOS=linux GOARCH=arm GOAR
 RUN chmod +x /talosctl-linux-armv7
 RUN touch --date="@${SOURCE_DATE_EPOCH}" /talosctl-linux-armv7
 
-FROM base AS talosctl-darwin-amd64-build
+FROM base AS talosctl-darwin-amd64-build # {{{2
 WORKDIR /src/cmd/talosctl
 ARG GO_BUILDFLAGS_TALOSCTL
 ARG GO_LDFLAGS
@@ -576,7 +575,7 @@ RUN --mount=type=cache,target=/.cache,id=talos/.cache GOOS=darwin GOARCH=amd64 G
 RUN chmod +x /talosctl-darwin-amd64
 RUN touch --date="@${SOURCE_DATE_EPOCH}" /talosctl-darwin-amd64
 
-FROM base AS talosctl-darwin-arm64-build
+FROM base AS talosctl-darwin-arm64-build # {{{2
 WORKDIR /src/cmd/talosctl
 ARG GO_BUILDFLAGS_TALOSCTL
 ARG GO_LDFLAGS
@@ -584,7 +583,7 @@ RUN --mount=type=cache,target=/.cache,id=talos/.cache GOOS=darwin GOARCH=arm64 g
 RUN chmod +x /talosctl-darwin-arm64
 RUN touch --date="@${SOURCE_DATE_EPOCH}" talosctl-darwin-arm64
 
-FROM base AS talosctl-windows-amd64-build
+FROM base AS talosctl-windows-amd64-build # {{{2
 WORKDIR /src/cmd/talosctl
 ARG GO_BUILDFLAGS_TALOSCTL
 ARG GO_LDFLAGS
@@ -592,14 +591,14 @@ ARG GOAMD64
 RUN --mount=type=cache,target=/.cache,id=talos/.cache GOOS=windows GOARCH=amd64 GOAMD64=${GOAMD64} go build ${GO_BUILDFLAGS_TALOSCTL} -ldflags "${GO_LDFLAGS}" -o /talosctl-windows-amd64.exe
 RUN touch --date="@${SOURCE_DATE_EPOCH}" /talosctl-windows-amd64.exe
 
-FROM base AS talosctl-windows-arm64-build
+FROM base AS talosctl-windows-arm64-build # {{{2
 WORKDIR /src/cmd/talosctl
 ARG GO_BUILDFLAGS_TALOSCTL
 ARG GO_LDFLAGS
 RUN --mount=type=cache,target=/.cache,id=talos/.cache GOOS=windows GOARCH=arm64 go build ${GO_BUILDFLAGS_TALOSCTL} -ldflags "${GO_LDFLAGS}" -o /talosctl-windows-arm64.exe
 RUN touch --date="@${SOURCE_DATE_EPOCH}" /talosctl-windows-arm64.exe
 
-FROM base AS talosctl-freebsd-amd64-build
+FROM base AS talosctl-freebsd-amd64-build # {{{2
 WORKDIR /src/cmd/talosctl
 ARG GO_BUILDFLAGS_TALOSCTL
 ARG GO_LDFLAGS
@@ -607,43 +606,43 @@ ARG GOAMD64
 RUN --mount=type=cache,target=/.cache,id=talos/.cache GOOS=freebsd GOARCH=amd64 GOAMD64=${GOAMD64} go build ${GO_BUILDFLAGS_TALOSCTL} -ldflags "${GO_LDFLAGS}" -o /talosctl-freebsd-amd64
 RUN touch --date="@${SOURCE_DATE_EPOCH}" /talosctl-freebsd-amd64
 
-FROM base AS talosctl-freebsd-arm64-build
+FROM base AS talosctl-freebsd-arm64-build # {{{2
 WORKDIR /src/cmd/talosctl
 ARG GO_BUILDFLAGS_TALOSCTL
 ARG GO_LDFLAGS
 RUN --mount=type=cache,target=/.cache,id=talos/.cache GOOS=freebsd GOARCH=arm64 go build ${GO_BUILDFLAGS_TALOSCTL} -ldflags "${GO_LDFLAGS}" -o /talosctl-freebsd-arm64
 RUN touch --date="@${SOURCE_DATE_EPOCH}" /talosctl-freebsd-arm64
 
-FROM scratch AS talosctl-linux-amd64
+FROM scratch AS talosctl-linux-amd64 # {{{2
 COPY --from=talosctl-linux-amd64-build /talosctl-linux-amd64 /talosctl-linux-amd64
 
-FROM scratch AS talosctl-linux-arm64
+FROM scratch AS talosctl-linux-arm64 # {{{2
 COPY --from=talosctl-linux-arm64-build /talosctl-linux-arm64 /talosctl-linux-arm64
 
-FROM scratch AS talosctl-linux-armv7
+FROM scratch AS talosctl-linux-armv7 # {{{2
 COPY --from=talosctl-linux-armv7-build /talosctl-linux-armv7 /talosctl-linux-armv7
 
-FROM scratch AS talosctl-darwin-amd64
+FROM scratch AS talosctl-darwin-amd64 # {{{2
 COPY --from=talosctl-darwin-amd64-build /talosctl-darwin-amd64 /talosctl-darwin-amd64
 
-FROM scratch AS talosctl-darwin-arm64
+FROM scratch AS talosctl-darwin-arm64 # {{{2
 COPY --from=talosctl-darwin-arm64-build /talosctl-darwin-arm64 /talosctl-darwin-arm64
 
-FROM scratch AS talosctl-freebsd-amd64
+FROM scratch AS talosctl-freebsd-amd64 # {{{2
 COPY --from=talosctl-freebsd-amd64-build /talosctl-freebsd-amd64 /talosctl-freebsd-amd64
 
-FROM scratch AS talosctl-freebsd-arm64
+FROM scratch AS talosctl-freebsd-arm64 # {{{2
 COPY --from=talosctl-freebsd-arm64-build /talosctl-freebsd-arm64 /talosctl-freebsd-arm64
 
-FROM scratch AS talosctl-windows-amd64
+FROM scratch AS talosctl-windows-amd64 # {{{2
 COPY --from=talosctl-windows-amd64-build /talosctl-windows-amd64.exe /talosctl-windows-amd64.exe
 
-FROM scratch AS talosctl-windows-arm64
+FROM scratch AS talosctl-windows-arm64 # {{{2
 COPY --from=talosctl-windows-arm64-build /talosctl-windows-arm64.exe /talosctl-windows-arm64.exe
 
 FROM --platform=${BUILDPLATFORM} talosctl-${TARGETOS}-${TARGETARCH} AS talosctl-targetarch
 
-FROM scratch AS talosctl-all
+FROM scratch AS talosctl-all # {{{2
 COPY --from=talosctl-linux-amd64 / /
 COPY --from=talosctl-linux-arm64 / /
 COPY --from=talosctl-linux-armv7 / /
@@ -654,7 +653,7 @@ COPY --from=talosctl-freebsd-arm64 / /
 COPY --from=talosctl-windows-amd64 / /
 COPY --from=talosctl-windows-arm64 / /
 
-FROM scratch AS talosctl
+FROM scratch AS talosctl # {{{2
 ARG TARGETARCH
 COPY --from=talosctl-all /talosctl-linux-${TARGETARCH} /talosctl
 ARG TAG
@@ -662,23 +661,24 @@ ENV VERSION=${TAG}
 LABEL "alpha.talos.dev/version"="${VERSION}"
 LABEL org.opencontainers.image.source=https://github.com/siderolabs/talos
 ENTRYPOINT ["/talosctl"]
+# }}}2
 
-# The kernel target is the linux kernel.
+# The kernel target is the linux kernel. # {{{1
 FROM scratch AS kernel
 ARG TARGETARCH
 COPY --from=pkg-kernel /boot/vmlinuz /vmlinuz-${TARGETARCH}
 
-# The sd-boot target is the systemd-boot asset.
+# The sd-boot target is the systemd-boot asset. # {{{1
 FROM scratch AS sd-boot
 ARG TARGETARCH
 COPY --from=pkg-sd-boot /*.efi /sd-boot-${TARGETARCH}.efi
 
-# The sd-stub target is the systemd-stub asset.
-FROM scratch AS sd-stub
+# The sd-stub target is the systemd-stub asset. # {{{1
+FROM scratch AS sd-stub # {{{2
 ARG TARGETARCH
 COPY --from=pkg-sd-boot /*.efi.stub /sd-stub-${TARGETARCH}.efi
 
-FROM tools AS depmod-amd64
+FROM tools AS depmod-amd64 # {{{2
 WORKDIR /staging
 COPY hack/modules-amd64.txt .
 COPY --from=pkg-kernel-amd64 /usr/lib/modules usr/lib/modules
@@ -692,10 +692,10 @@ xargs -a modules-amd64.txt -I {} install -D usr/lib/modules/${KERNEL_VERSION}/{}
 depmod -b /build/usr ${KERNEL_VERSION}
 EOF
 
-FROM scratch AS modules-amd64
+FROM scratch AS modules-amd64 # {{{2
 COPY --from=depmod-amd64 /build/usr/lib/modules /usr/lib/modules
 
-FROM tools AS depmod-arm64
+FROM tools AS depmod-arm64 # {{{2
 WORKDIR /staging
 COPY hack/modules-arm64.txt .
 COPY --from=pkg-kernel-arm64 /usr/lib/modules usr/lib/modules
@@ -709,12 +709,13 @@ xargs -a modules-arm64.txt -I {} install -D usr/lib/modules/${KERNEL_VERSION}/{}
 depmod -b /build/usr ${KERNEL_VERSION}
 EOF
 
-FROM scratch AS modules-arm64
+FROM scratch AS modules-arm64 # {{{2
 COPY --from=depmod-arm64 /build/usr/lib/modules /usr/lib/modules
+# }}}2
 
-# The rootfs target provides the Talos rootfs.
-FROM build AS rootfs-base-amd64
-COPY --link --from=pkg-fhs / /rootfs
+# The rootfs target provides the Talos rootfs. # {{{1
+FROM build AS rootfs-base-amd64 # {{{2
+COPY --link --from=pkg-fhs / /rootfs # {{{3
 COPY --link --from=pkg-apparmor-amd64 / /rootfs
 COPY --link --from=pkg-cni-stripped-amd64 / /rootfs
 COPY --link --from=pkg-flannel-cni-amd64 / /rootfs
@@ -752,7 +753,7 @@ COPY --link --from=machined-build-amd64 /machined /rootfs/usr/bin/init
 # this is a no-op as it copies from a scratch image when WITH_DEBUG_SHELL is not set
 COPY --link --from=pkg-debug-tools-amd64 * /rootfs/
 
-RUN <<END
+RUN <<END # {{{3
     # the orderly_poweroff call by the kernel will call '/sbin/poweroff'
     ln /rootfs/usr/bin/init /rootfs/usr/bin/poweroff
     chmod +x /rootfs/usr/bin/poweroff
@@ -762,7 +763,7 @@ RUN <<END
     ln /rootfs/usr/bin/init /rootfs/usr/bin/dashboard
     chmod +x /rootfs/usr/bin/dashboard
 END
-# NB: We run the cleanup step before creating extra directories, files, and
+# NB: We run the cleanup step before creating extra directories, files, and # {{{3
 # symlinks to avoid accidentally cleaning them up.
 COPY ./hack/cleanup.sh /usr/bin/cleanup.sh
 RUN <<END
@@ -771,7 +772,7 @@ RUN <<END
     mkdir -pv /rootfs/{etc/kubernetes/manifests,etc/cni/net.d,etc/ssl/certs,usr/libexec/kubernetes,/usr/local/lib/kubelet/credentialproviders,etc/selinux/targeted/contexts/files}
     mkdir -pv /rootfs/opt/{containerd/bin,containerd/lib}
 END
-COPY --chmod=0644 hack/zoneinfo/Etc/UTC /rootfs/usr/share/zoneinfo/Etc/UTC
+COPY --chmod=0644 hack/zoneinfo/Etc/UTC /rootfs/usr/share/zoneinfo/Etc/UTC # {{{3
 COPY --chmod=0644 hack/nfsmount.conf /rootfs/etc/nfsmount.conf
 COPY --chmod=0644 hack/containerd.toml /rootfs/etc/containerd/config.toml
 COPY --chmod=0644 hack/cri-containerd.toml /rootfs/etc/cri/containerd.toml
@@ -780,7 +781,7 @@ COPY --chmod=0644 hack/udevd/99-default.link /rootfs/usr/lib/systemd/network/
 COPY --chmod=0644 hack/udevd/90-selinux.rules /rootfs/usr/lib/udev/rules.d/
 COPY --chmod=0644 hack/lvm.conf /rootfs/etc/lvm/lvm.conf
 COPY --chmod=0644 --from=base /src/pkg/machinery/version/os-release /rootfs/etc/os-release
-RUN <<END
+RUN <<END # {{{3
     ln -s /usr/share/zoneinfo/Etc/UTC /rootfs/etc/localtime
     touch /rootfs/etc/{extensions.yaml,resolv.conf,hosts,machine-id,cri/conf.d/cri.toml,cri/conf.d/01-registries.part,cri/conf.d/20-customization.part,cri/conf.d/base-spec.json,ssl/certs/ca-certificates.crt,selinux/targeted/contexts/files/file_contexts,iscsi/initiatorname.iscsi,nvme/{hostid,hostnqn}}
     ln -s ca-certificates.crt /rootfs/etc/ssl/certs/ca-certificates
@@ -789,9 +790,10 @@ RUN <<END
     ln -s /etc/ssl /rootfs/usr/local/share/ca-certificates
     ln -s /etc/ssl /rootfs/etc/ca-certificates
 END
+# }}}3
 
-FROM build AS rootfs-base-arm64
-COPY --link --from=pkg-fhs / /rootfs
+FROM build AS rootfs-base-arm64 # {{{2
+COPY --link --from=pkg-fhs / /rootfs # {{{3
 COPY --link --from=pkg-apparmor-arm64 / /rootfs
 COPY --link --from=pkg-cni-stripped-arm64 / /rootfs
 COPY --link --from=pkg-flannel-cni-arm64 / /rootfs
@@ -829,7 +831,7 @@ COPY --link --from=machined-build-arm64 /machined /rootfs/usr/bin/init
 # this is a no-op as it copies from a scratch image when WITH_DEBUG_SHELL is not set
 COPY --link --from=pkg-debug-tools-arm64 * /rootfs/
 
-RUN <<END
+RUN <<END # {{{3
     # the orderly_poweroff call by the kernel will call '/sbin/poweroff'
     ln /rootfs/usr/bin/init /rootfs/usr/bin/poweroff
     chmod +x /rootfs/usr/bin/poweroff
@@ -839,7 +841,7 @@ RUN <<END
     ln /rootfs/usr/bin/init /rootfs/usr/bin/dashboard
     chmod +x /rootfs/usr/bin/dashboard
 END
-# NB: We run the cleanup step before creating extra directories, files, and
+# NB: We run the cleanup step before creating extra directories, files, and # {{{3
 # symlinks to avoid accidentally cleaning them up.
 COPY ./hack/cleanup.sh /usr/bin/cleanup.sh
 RUN <<END
@@ -848,7 +850,7 @@ RUN <<END
     mkdir -pv /rootfs/{etc/kubernetes/manifests,etc/cni/net.d,etc/ssl/certs,usr/libexec/kubernetes,/usr/local/lib/kubelet/credentialproviders,etc/selinux/targeted/contexts/files}
     mkdir -pv /rootfs/opt/{containerd/bin,containerd/lib}
 END
-COPY --chmod=0644 hack/zoneinfo/Etc/UTC /rootfs/usr/share/zoneinfo/Etc/UTC
+COPY --chmod=0644 hack/zoneinfo/Etc/UTC /rootfs/usr/share/zoneinfo/Etc/UTC # {{{3
 COPY --chmod=0644 hack/nfsmount.conf /rootfs/etc/nfsmount.conf
 COPY --chmod=0644 hack/containerd.toml /rootfs/etc/containerd/config.toml
 COPY --chmod=0644 hack/cri-containerd.toml /rootfs/etc/cri/containerd.toml
@@ -857,7 +859,7 @@ COPY --chmod=0644 hack/udevd/99-default.link /rootfs/usr/lib/systemd/network/
 COPY --chmod=0644 hack/udevd/90-selinux.rules /rootfs/usr/lib/udev/rules.d/
 COPY --chmod=0644 hack/lvm.conf /rootfs/etc/lvm/lvm.conf
 COPY --chmod=0644 --from=base /src/pkg/machinery/version/os-release /rootfs/etc/os-release
-RUN <<END
+RUN <<END # {{{3
     ln -s /usr/share/zoneinfo/Etc/UTC /rootfs/etc/localtime
     touch /rootfs/etc/{extensions.yaml,resolv.conf,hosts,machine-id,cri/conf.d/cri.toml,cri/conf.d/01-registries.part,cri/conf.d/20-customization.part,cri/conf.d/base-spec.json,ssl/certs/ca-certificates.crt,selinux/targeted/contexts/files/file_contexts,iscsi/initiatorname.iscsi,nvme/{hostid,hostnqn}}
     ln -s ca-certificates.crt /rootfs/etc/ssl/certs/ca-certificates
@@ -866,14 +868,15 @@ RUN <<END
     ln -s /etc/ssl /rootfs/usr/local/share/ca-certificates
     ln -s /etc/ssl /rootfs/etc/ca-certificates
 END
+# }}}3
 
-FROM rootfs-base-${TARGETARCH} AS rootfs-base
+FROM rootfs-base-${TARGETARCH} AS rootfs-base # {{{2
 RUN echo "true" > /rootfs/usr/etc/in-container
 RUN rm -rf /rootfs/usr/lib/modules/*
 RUN find /rootfs -print0 \
     | xargs -0r touch --no-dereference --date="@${SOURCE_DATE_EPOCH}"
 
-FROM rootfs-base-arm64 AS rootfs-squashfs-arm64
+FROM rootfs-base-arm64 AS rootfs-squashfs-arm64 # {{{2
 ARG ZSTD_COMPRESSION_LEVEL
 RUN find /rootfs -print0 \
     | xargs -0r touch --no-dereference --date="@${SOURCE_DATE_EPOCH}"
@@ -881,7 +884,7 @@ COPY --from=selinux-generate /policy/file_contexts /file_contexts
 COPY ./hack/labeled-squashfs.sh /
 RUN fakeroot /labeled-squashfs.sh /rootfs /rootfs.sqsh /file_contexts ${ZSTD_COMPRESSION_LEVEL}
 
-FROM rootfs-base-amd64 AS rootfs-squashfs-amd64
+FROM rootfs-base-amd64 AS rootfs-squashfs-amd64 # {{{2
 ARG ZSTD_COMPRESSION_LEVEL
 RUN find /rootfs -print0 \
     | xargs -0r touch --no-dereference --date="@${SOURCE_DATE_EPOCH}"
@@ -889,18 +892,29 @@ COPY --from=selinux-generate /policy/file_contexts /file_contexts
 COPY ./hack/labeled-squashfs.sh /
 RUN fakeroot /labeled-squashfs.sh /rootfs /rootfs.sqsh /file_contexts ${ZSTD_COMPRESSION_LEVEL}
 
-FROM scratch AS squashfs-arm64
+FROM scratch AS squashfs-arm64 # {{{2
 COPY --from=rootfs-squashfs-arm64 /rootfs.sqsh /
 
-FROM scratch AS squashfs-amd64
+FROM scratch AS squashfs-amd64 # {{{2
 COPY --from=rootfs-squashfs-amd64 /rootfs.sqsh /
 
-FROM scratch AS rootfs
+FROM scratch AS rootfs # {{{2
 COPY --from=rootfs-base /rootfs /
+# }}}2
 
-# The initramfs target provides the Talos initramfs image.
+# The initramfs target provides the Talos initramfs image. # {{{1
+#
+# For example:
+#  initramfs
+#    initramfs-archive
+#      initramfs-archive-arm64
+#        squashfs-arm64
+#          rootfs-squashfs-arm64
+#            selinux-generate
+#              selinux
+#        init-build-arm64
 
-FROM build AS initramfs-archive-arm64
+FROM build AS initramfs-archive-arm64 # {{{2
 WORKDIR /initramfs
 ARG ZSTD_COMPRESSION_LEVEL
 COPY --from=squashfs-arm64 /rootfs.sqsh .
@@ -914,7 +928,7 @@ RUN set -o pipefail \
     | zstd -c -T0 -${ZSTD_COMPRESSION_LEVEL} \
     > /initramfs.xz
 
-FROM build AS initramfs-archive-amd64
+FROM build AS initramfs-archive-amd64 # {{{2
 WORKDIR /initramfs
 ARG ZSTD_COMPRESSION_LEVEL
 COPY --from=squashfs-amd64 /rootfs.sqsh .
@@ -928,23 +942,22 @@ RUN set -o pipefail \
     | zstd -c -T0 -${ZSTD_COMPRESSION_LEVEL} \
     > /initramfs.xz
 
-FROM initramfs-archive-${TARGETARCH} AS initramfs-archive
+FROM initramfs-archive-${TARGETARCH} AS initramfs-archive # {{{2
 
-FROM scratch AS initramfs
+FROM scratch AS initramfs # {{{2
 ARG TARGETARCH
 COPY --from=initramfs-archive /initramfs.xz /initramfs-${TARGETARCH}.xz
+# }}}2
 
-# The talos target generates a docker image that can be used to run Talos
-# in containers.
+# The talos target generates a docker image that can be used to run Talos in containers. # {{{1
 
 FROM scratch AS talos
 COPY --from=rootfs / /
 LABEL org.opencontainers.image.source=https://github.com/siderolabs/talos
 ENTRYPOINT ["/sbin/init"]
 
-# The installer target generates an image that can be used to install Talos to
-# various environments.
-FROM base AS installer-build
+# The installer target generates an image that can be used to install Talos to various environments. # {{{1
+FROM base AS installer-build # {{{2
 ARG GO_BUILDFLAGS
 ARG GO_LDFLAGS
 WORKDIR /src/cmd/installer
@@ -952,19 +965,19 @@ ARG TARGETARCH
 RUN --mount=type=cache,target=/.cache,id=talos/.cache GOOS=linux GOARCH=${TARGETARCH} go build ${GO_BUILDFLAGS} -ldflags "${GO_LDFLAGS}" -o /installer
 RUN chmod +x /installer
 
-FROM scratch AS install-artifacts-amd64
+FROM scratch AS install-artifacts-amd64 # {{{2
 COPY --from=pkg-kernel-amd64 /boot/vmlinuz /usr/install/amd64/vmlinuz
 COPY --from=initramfs-archive-amd64 /initramfs.xz /usr/install/amd64/initramfs.xz
 COPY --from=pkg-sd-boot-amd64 /linuxx64.efi.stub /usr/install/amd64/systemd-stub.efi
 COPY --from=pkg-sd-boot-amd64 /systemd-bootx64.efi /usr/install/amd64/systemd-boot.efi
 
-FROM scratch AS install-artifacts-arm64
+FROM scratch AS install-artifacts-arm64 # {{{2
 COPY --from=pkg-kernel-arm64 /boot/vmlinuz /usr/install/arm64/vmlinuz
 COPY --from=initramfs-archive-arm64 /initramfs.xz /usr/install/arm64/initramfs.xz
 COPY --from=pkg-sd-boot-arm64 /linuxaa64.efi.stub /usr/install/arm64/systemd-stub.efi
 COPY --from=pkg-sd-boot-arm64 /systemd-bootaa64.efi /usr/install/arm64/systemd-boot.efi
 
-FROM scratch AS install-artifacts-all
+FROM scratch AS install-artifacts-all # {{{2
 COPY --from=install-artifacts-amd64 / /
 COPY --from=install-artifacts-arm64 / /
 
@@ -972,11 +985,11 @@ FROM install-artifacts-${TARGETARCH} AS install-artifacts-targetarch
 
 FROM install-artifacts-${INSTALLER_ARCH} AS install-artifacts
 
-FROM tools AS installer-image-gen
+FROM tools AS installer-image-gen # {{{2
 COPY --from=installer-build /installer /rootfs/usr/bin/installer
 RUN ln -s installer /rootfs/usr/bin/imager
 
-FROM scratch AS installer-base-image
+FROM scratch AS installer-base-image # {{{2
 ARG TARGETARCH
 ENV TARGETARCH=${TARGETARCH}
 COPY --link --from=pkg-fhs / /
@@ -992,17 +1005,17 @@ COPY --link --exclude=**/*.a --exclude=**/*.la  --exclude=usr/include --exclude=
 COPY --link --from=pkg-xfsprogs / /
 COPY --link --from=installer-image-gen /rootfs /
 
-FROM scratch AS installer-base-image-squashed
+FROM scratch AS installer-base-image-squashed # {{{2
 COPY --from=installer-base-image / /
 
-FROM installer-base-image-squashed AS installer-base
+FROM installer-base-image-squashed AS installer-base # {{{2
 ARG TAG
 ENV VERSION=${TAG}
 LABEL "alpha.talos.dev/version"="${VERSION}"
 LABEL org.opencontainers.image.source=https://github.com/siderolabs/talos
 ENTRYPOINT ["/bin/installer"]
 
-FROM installer-base-image-squashed AS imager-image
+FROM installer-base-image-squashed AS imager-image # {{{2
 COPY --link --from=pkg-cpio / /
 COPY --link --exclude=**/*.a --exclude=**/*.la  --exclude=usr/lib/pkgconfig --from=pkg-e2fsprogs / /
 COPY --link --exclude=**/*.a --exclude=**/*.la --exclude=usr/include --exclude=usr/lib/pkgconfig --from=pkg-glib / /
@@ -1028,17 +1041,17 @@ COPY --link --exclude=**/*.a --exclude=**/*.la  --exclude=usr/include --exclude=
 COPY --chmod=0644 hack/extra-modules.conf /etc/modules.d/10-extra-modules.conf
 COPY --from=install-artifacts / /
 
-FROM scratch AS imager-image-squashed
+FROM scratch AS imager-image-squashed # {{{2
 COPY --from=imager-image / /
 
-FROM imager-image-squashed AS imager
+FROM imager-image-squashed AS imager # {{{2
 ARG TAG
 ENV VERSION=${TAG}
 LABEL "alpha.talos.dev/version"="${VERSION}"
 LABEL org.opencontainers.image.source=https://github.com/siderolabs/talos
 ENTRYPOINT ["/bin/imager"]
 
-FROM imager AS iso-amd64-build
+FROM imager AS iso-amd64-build # {{{2
 ARG SOURCE_DATE_EPOCH
 ENV SOURCE_DATE_EPOCH=${SOURCE_DATE_EPOCH}
 RUN /bin/installer \
@@ -1046,7 +1059,7 @@ RUN /bin/installer \
     --arch amd64 \
     --output /out
 
-FROM imager AS iso-arm64-build
+FROM imager AS iso-arm64-build # {{{2
 ARG SOURCE_DATE_EPOCH
 ENV SOURCE_DATE_EPOCH=${SOURCE_DATE_EPOCH}
 RUN /bin/installer \
@@ -1054,15 +1067,16 @@ RUN /bin/installer \
     --arch arm64 \
     --output /out
 
-FROM scratch AS iso-amd64
+FROM scratch AS iso-amd64 # {{{2
 COPY --from=iso-amd64-build /out /
 
-FROM scratch AS iso-arm64
+FROM scratch AS iso-arm64 # {{{2
 COPY --from=iso-arm64-build /out /
 
 FROM --platform=${BUILDPLATFORM} iso-${TARGETARCH} AS iso
+# }}}2
 
-# The test target performs tests on the source code.
+# The test target performs tests on the source code. # {{{1
 FROM base AS unit-tests-runner
 COPY --from=rootfs / /
 COPY --from=pkg-ca-certificates / /
@@ -1075,7 +1089,7 @@ RUN --security=insecure --mount=type=cache,id=testspace,target=/tmp --mount=type
 FROM scratch AS unit-tests
 COPY --from=unit-tests-runner /src/coverage.txt /coverage.txt
 
-# The unit-tests-race target performs tests with race detector.
+# The unit-tests-race target performs tests with race detector. # {{{1
 
 FROM base AS unit-tests-race
 COPY --from=rootfs / /
@@ -1088,7 +1102,7 @@ RUN --security=insecure --mount=type=cache,id=testspace,target=/tmp --mount=type
     -ldflags "${GO_LDFLAGS}" \
     -race -count 1 -p 4 ${TESTPKGS}
 
-# The integration-test targets builds integration test binary.
+# The integration-test targets builds integration test binary. # {{{1
 
 FROM base AS integration-test-linux-amd64-build
 ARG GO_BUILDFLAGS
@@ -1115,7 +1129,7 @@ COPY --from=integration-test-linux-arm64-build /src/integration.test /integratio
 
 FROM --platform=${BUILDPLATFORM} integration-test-${TARGETOS}-${TARGETARCH} AS integration-test-targetarch
 
-# The integration-test-provision target builds integration test binary with provisioning tests.
+# The integration-test-provision target builds integration test binary with provisioning tests. # {{{1
 
 FROM base AS integration-test-provision-linux-build
 ARG GO_BUILDFLAGS
@@ -1129,7 +1143,7 @@ RUN --mount=type=cache,target=/.cache,id=talos/.cache GOOS=linux GOARCH=amd64 GO
 FROM scratch AS integration-test-provision-linux
 COPY --from=integration-test-provision-linux-build /src/integration.test /integration-test-provision-linux-amd64
 
-# The module-sig-verify targets builds module-sig-verify binary.
+# The module-sig-verify targets builds module-sig-verify binary. # {{{1
 FROM build-go AS module-sig-verify-linux-build
 ARG GO_BUILDFLAGS
 ARG GO_LDFLAGS
@@ -1143,7 +1157,7 @@ RUN --mount=type=cache,target=/.cache,id=talos/.cache GOOS=linux GOARCH=amd64 GO
 FROM scratch AS module-sig-verify-linux
 COPY --from=module-sig-verify-linux-build /src/module-sig-verify/module-sig-verify /module-sig-verify-linux-amd64
 
-# The lint target performs linting on the source code.
+# The lint target performs linting on the source code. # {{{1
 FROM base AS lint-go
 COPY .golangci.yml .
 ENV GOGC=50
@@ -1158,7 +1172,7 @@ RUN --mount=type=cache,target=/.cache,id=talos/.cache,sharing=locked golangci-li
 WORKDIR /src
 RUN --mount=type=cache,target=/.cache,id=talos/.cache importvet github.com/siderolabs/talos/...
 
-# The protolint target performs linting on protobuf files.
+# The protolint target performs linting on protobuf files. # {{{1
 
 FROM base AS lint-protobuf
 WORKDIR /src/api
@@ -1166,7 +1180,7 @@ COPY api .
 RUN --mount=type=cache,target=/.cache,id=talos/.cache prototool lint --protoc-bin-path=/usr/bin/protoc --protoc-wkt-path=/usr/include
 RUN --mount=type=cache,target=/.cache,id=talos/.cache prototool break check --descriptor-set-path=api.descriptors --protoc-bin-path=/usr/bin/protoc --protoc-wkt-path=/usr/include
 
-# The markdownlint target performs linting on Markdown files.
+# The markdownlint target performs linting on Markdown files. # {{{1
 
 FROM oven/bun:1-alpine AS lint-markdown
 ARG MARKDOWNLINTCLI_VERSION
@@ -1199,7 +1213,7 @@ RUN find . \
     -print0 \
     | xargs -0 bun run --bun textlint
 
-# The docs target generates documentation.
+# The docs target generates documentation. # {{{1
 
 FROM base AS docs-build
 ARG TARGETOS
@@ -1240,13 +1254,13 @@ COPY --from=docs-build /tmp/cli.md /website/content/v1.11/reference/
 COPY --from=docs-build /tmp/schemas /website/content/v1.11/schemas/
 COPY --from=proto-docs-build /tmp/api.md /website/content/v1.11/reference/
 
-# The talosctl-cni-bundle builds the CNI bundle for talosctl.
+# The talosctl-cni-bundle builds the CNI bundle for talosctl. # {{{1
 
 FROM scratch AS talosctl-cni-bundle
 ARG TARGETARCH
 COPY --from=pkgs-talosctl-cni-bundle /opt/cni/bin/ /talosctl-cni-bundle-${TARGETARCH}/
 
-# The go-mod-outdated target lists all outdated modules.
+# The go-mod-outdated target lists all outdated modules. # {{{1
 
 FROM base AS go-mod-outdated
 RUN --mount=type=cache,target=/.cache,id=talos/.cache go install github.com/psampaz/go-mod-outdated@latest \
