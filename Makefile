@@ -12,7 +12,7 @@ export HELP_MENU_HEADER
 .PHONY: pull
 pull: ## Pull the latest from ${SUBMODULE}
 	@cd ${SUBMODULE};git reset --hard; rm -f GNUmakefile; \
-		[ "$$(git pull)" = 'Already up to date.' ] && ../bin/undo-reset ${SUBMODULE} || echo OK; \
+		git pull; cp ../GNUmakefile_${SUBMODULE} GNUmakefile; \
 		make
 
 help: ## This help menu.
@@ -25,7 +25,7 @@ sb: clean sandbox ## Reset the sandbox and run make there.
 
 .PHONY: sandbox
 sandbox: ## Init the sandbox.
-	@mkdir sandbox
+	@mkdir -p sandbox/_out
 	@cp Makefile_sandbox sandbox/Makefile
 	@cp Dockerfile_sandbox sandbox/Dockerfile
 
