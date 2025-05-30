@@ -33,3 +33,9 @@ sandbox: ## Init the sandbox.
 clean: ## Clean up the sandbox.
 	@-rm -rf sandbox
 
+%: force
+	@cp GNUmakefile_${SUBMODULE} ${SUBMODULE}/GNUmakefile; \
+		[ '$@' = 'Makefile' ] && exit; \
+		echo '<<< delegating' $@ '...'; $(MAKE) -C ${SUBMODULE} $@
+force: ;
+

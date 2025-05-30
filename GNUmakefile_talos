@@ -1,4 +1,4 @@
-ARCH != [ "$$(arch)" = 'aarch64' ] && echo arm64 || echo amd64
+ARCH != [ "$$(arch)" = 'aarch64' ] && echo arm64 || echo amd64 # {{{1
 ARTIFACTS ?= _out
 CILIUM_CLI_VERSION ?= v0.18.3
 HELM_VERSION ?= v3.17.3
@@ -17,23 +17,29 @@ CILIUM_CLI_URL ?= https://github.com/cilium/cilium-cli/releases/download/$(CILIU
 PLATFORM ?= linux/$(ARCH)
 REGISTRY_AND_USERNAME := $(REGISTRY)/$(USERNAME)
 
-.PHONY: tools
-tools: ## Output the tools to $(ARTIFACTS)/tools.
-	@rm -rf $(ARTIFACTS)/$@; mkdir -p $(ARTIFACTS)/$@; $(MAKE) local-$@ DEST=$(ARTIFACTS)/$@ PUSH=false
-
-.PHONY: all
+.PHONY: all # {{{1
 all: initramfs kernel installer imager talosctl talos unit-tests
 
-.PHONY: installer
+.PHONY: tools # {{{1
+tools: ## Output the tools to docker.io/amissine/mt_tools.
+	@$(MAKE) target-$@
+
+.PHONY: installer # {{{1
 installer: ## Builds the installer and outputs it to the artifact directory.
 	@echo '<<< running' $@ '...'
 	@$(MAKE) image-installer IMAGER_ARGS="--base-installer-image $(REGISTRY_AND_USERNAME)/installer-base:$(TAG)"
 
-%: force
-	@echo '<<< delegating' $@ '...';var='$@';[ -z "$${var##target-*}" ] && echo 'TARGET_ARGS' $(TARGET_ARGS) || echo
-	@$(MAKE) -f Makefile $@ PLATFORM=${PLATFORM} SHA=${SHA} TAG=${TAG}
+.PHONY: test # {{{1
+test: ## A test target
+	@echo '<<< running' $@ '...'
+
+%: force # {{{1
+	@[ '$@' = 'GNUmakefile' -o '$@' = 'Makefile' ] && exit; \
+		echo '<<< delegating' $@ '...'; \
+		[ '$@' = 'target-tools' ] && TARGET_ARGS='--output type=image,name=amissine/ali_guest:${TAG},push=true' || TARGET_ARGS='${TARGET_ARGS}'; \
+		var='$@'; [ -z "$${var##target-*}" ] && echo 'TARGET_ARGS' "$$TARGET_ARGS" || echo; \
+		$(MAKE) -f Makefile $@ PLATFORM=${PLATFORM} SHA=${SHA} TAG=${TAG} TARGET_ARGS="$$TARGET_ARGS"
 force: ;
 
-## {{{1
-# Use :set ft=make in vim
+## Use :set ft=make in vim {{{1
 ##
