@@ -21,7 +21,7 @@ REGISTRY_AND_USERNAME := $(REGISTRY)/$(USERNAME)
 all: initramfs kernel installer imager talosctl talos unit-tests
 
 .PHONY: tools # {{{1
-tools: ## Output the tools to docker.io/amissine/mt_tools.
+tools: ## Output the tools to amissine/ali_guest.
 	@$(MAKE) target-$@
 
 .PHONY: installer # {{{1
