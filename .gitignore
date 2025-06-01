@@ -3,5 +3,5 @@
 *.session
 
 # Misc {{{1
-make.log
+*.log
 sandbox

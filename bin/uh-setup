@@ -5,7 +5,8 @@
 
 ARCH=$([ "$(arch)" = 'aarch64' ] && echo 'arm64' || echo 'amd64')
 GO_VERSION=1.24.3
-NODE_VERSION=20
+NODE_MAJOR_VERSION=20
+NODE_VERSION=v20.19.2
 NVM_VERSION=v0.40.3
 
 config_git () { # {{{1
@@ -47,8 +48,8 @@ install_node () { # {{{1
   export NVM_DIR="$HOME/.nvm"
   [ -s "$NVM_DIR/nvm.sh" ] && \. "$NVM_DIR/nvm.sh"  # This loads nvm
   [ -s "$NVM_DIR/bash_completion" ] && \. "$NVM_DIR/bash_completion"  # This loads nvm bash_completion
-  nvm install $NODE_VERSION
-  nvm use $NODE_VERSION
+  nvm install $NODE_MAJOR_VERSION
+  nvm use $NODE_MAJOR_VERSION
   [ -e /usr/local/bin/node ] || sudo ln $HOME/.nvm/versions/node/$NODE_VERSION/bin/node /usr/local/bin/node
 }
 
@@ -74,7 +75,7 @@ run () { # {{{1
 }
 
 setup_vim () { # {{{1
-  [ -d $HOME/.vim/autoload ] && return
+  [ -d $HOME/.vim/autoload ] && echo "vim for $USER is set up" && return
   [ -e $HOME/.vimrc.uh.saved ] && mv $HOME/.vimrc.uh.saved $HOME/.vimrc && rm -rf $HOME/.vim/autoload # debug/teardown
   [ -e $HOME/.vimrc ] && cp $HOME/.vimrc $HOME/.vimrc.uh.saved || touch $HOME/.vimrc.uh.saved
   cat << HD > $HOME/.vimrc # {{{2
