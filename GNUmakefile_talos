@@ -29,6 +29,11 @@ installer: ## Builds the installer and outputs it to the artifact directory.
 	@echo '<<< running' $@ '...'
 	@$(MAKE) image-installer IMAGER_ARGS="--base-installer-image $(REGISTRY_AND_USERNAME)/installer-base:$(TAG)"
 
+.PHONY: unittest # {{{1
+unittest: ## A unittest PKG=to/test target
+	@echo '<<< running' $@ ${PKG}'...'
+	$(MAKE) -f Makefile unit-tests TESTPKGS=${PKG} # github.com/siderolabs/talos/internal/app/machined/pkg/system/runner/process
+
 .PHONY: test # {{{1
 test: ## A test target
 	@echo '<<< running' $@ '...'
