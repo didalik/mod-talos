@@ -33,6 +33,7 @@ History so far:
 
 ```
 git submodule add https://github.com/siderolabs/talos.git
+curl -sSfL https://raw.githubusercontent.com/aquaproj/aqua-installer/v3.1.2/aqua-installer | bash
 ```
 
 See also:
