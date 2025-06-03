@@ -66,6 +66,7 @@ run () { # {{{1
     install_go
     which make || apt update && apt install make
     which tree || apt install tree
+    curl -sSfL https://raw.githubusercontent.com/aquaproj/aqua-installer/v3.1.2/aqua-installer | bash # install aqua
     [ -d $HOME/people/didalik/mod-talos ] && return || echo 'Cloning mod-talos...'
     git clone --recurse-submodules git@github.com:didalik/mod-talos.git
   else
