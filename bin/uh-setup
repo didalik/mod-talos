@@ -11,7 +11,7 @@ NVM_VERSION=v0.40.3
 config_git () { # {{{1
   git config --global user.email "didalik.aim@gmail.com"
   git config --global user.name "Дід Alik"
-  git config pull.rebase false
+  git config --global pull.rebase false
   git config --global core.editor "vim"
 }
 
