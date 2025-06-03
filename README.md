@@ -10,6 +10,7 @@ git clone https://github.com/didalik/mod-talos.git
 cd mod-talos
 bin/uh-setup
 vim ~/.vimrc # wait for the plugins to install
+...
 :qa
 exit
 ```
@@ -18,6 +19,7 @@ exit
 
 ```
 vim .vimrc # wait for the plugins to install
+...
 :qa
 cd people/didalik/mod-talos
 make
