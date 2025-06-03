@@ -3,7 +3,27 @@ Submodule Talos to build, deploy and test its artifacts locally.
 
 ## Getting Started
 
-To setup your Ubuntu 24 box, run `bin/uh-setup`. Then see if `make help` is of use.
+1. SSH to your sudo account on your Ubuntu 24 box, then
+
+```
+git clone https://github.com/didalik/mod-talos.git
+cd mod-talos
+bin/uh-setup
+vim ~/.vimrc # wait for the plugins to install
+:qa
+exit
+```
+
+2. SSH to your root account on your Ubuntu 24 box, then
+
+```
+vim .vimrc # wait for the plugins to install
+:qa
+cd people/didalik/mod-talos
+make
+```
+
+The `make` command takes time to complete.
 
 ## Work In Progress
 
