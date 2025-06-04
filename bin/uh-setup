@@ -3,6 +3,7 @@
 # Setup for $USER@$HOSTNAME - both sudoer and root
 ##
 
+AQUA_INSTALLER_VERSION=v3.1.2
 ARCH=$([ "$(arch)" = 'aarch64' ] && echo 'arm64' || echo 'amd64')
 GO_VERSION=1.24.3
 NODE_MAJOR_VERSION=20
@@ -19,6 +20,11 @@ config_git () { # {{{1
 
 help () { # {{{1
 	echo "help $# $@"
+}
+
+install_aqua () { # {{{1
+  which aqua && return
+  curl -sSfL https://raw.githubusercontent.com/aquaproj/aqua-installer/$AQUA_INSTALLER_VERSION/aqua-installer | bash
 }
 
 install_docker () { # {{{1
@@ -64,9 +70,9 @@ run () { # {{{1
     cd $HOME/people/didalik
     install_docker
     install_go
+    install_aqua
     which make || apt update && apt install make
     which tree || apt install tree
-    curl -sSfL https://raw.githubusercontent.com/aquaproj/aqua-installer/v3.1.2/aqua-installer | bash # install aqua
     [ -d $HOME/people/didalik/mod-talos ] && return || echo 'Cloning mod-talos...'
     git clone --recurse-submodules git@github.com:didalik/mod-talos.git
   else
@@ -131,13 +137,11 @@ HD
 
 validate () { # {{{1
 	echo "validate $# $@"
-  [ "$(uname)" = 'Linux' ] || {
-    echo -e "\n\tERROR: invalid uname: expected 'Linux', got '$(uname)'\n"; return 1
-  }
+  [ "$(uname)" = 'Linux' ] || echo -e "\n\tERROR: invalid uname: expected 'Linux', got '$(uname)'\n" && return 1
   [ "$USER" = 'root' ] || [ -e /etc/sudoers.d/$USER ] || echo "$USER  ALL=(ALL) NOPASSWD:ALL" | sudo tee /etc/sudoers.d/$USER
   [ -z "$SSH_CLIENT" ] || echo SSH_CLIENT $SSH_CLIENT
 }
 
 echo "$0 started for $USER on $(date) in $PWD" # {{{1
 validate $@ && run $@ || help $@
-echo "$0 DONE for $USER"
+echo "$0 DONE for $USER@$HOSTNAME"
