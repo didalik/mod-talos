@@ -7,7 +7,7 @@ Here,I just reflect the steps I make - ymmv, but not much.
 
 On my Macbook Air M1 (RAM 8Gb, SSD 256Gb) with UTM, I create QEMU 7.2 Virtual Machine:
 
-- Name: `wx`,
+- Name: `t2`,
 - Size: 192Gb,
 - Network Mode: Bridged (Advanced),
 - QEMU: Use local time for base clock,
@@ -16,10 +16,10 @@ On my Macbook Air M1 (RAM 8Gb, SSD 256Gb) with UTM, I create QEMU 7.2 Virtual Ma
 and add the following line to my `/etc/hosts` (your IP and username will differ):
 
 ```
-192.168.0.193   wx      # alik
+192.168.0.193   t2      # alik
 ```
 
-Having SSHed to alik@wx, I run there
+Having SSHed to alik@t2, I run there
 
 ```
 echo 'alik ALL=(ALL) NOPASSWD:ALL' | sudo tee /etc/sudoers.d/alik
@@ -29,7 +29,7 @@ exit
 and complete the setup with
 
 ```
-bin/uh-setup alik wx windsor-quick-start
+bin/uh-setup alik t2 mod-talos
 ```
 
 ## Work In Progress
