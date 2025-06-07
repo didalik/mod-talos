@@ -19,12 +19,7 @@ config_git () { # {{{1
 }
 
 help () { # {{{1
-	echo "help $# $@"
-}
-
-install_aqua () { # {{{1
-  which aqua && return
-  curl -sSfL https://raw.githubusercontent.com/aquaproj/aqua-installer/$AQUA_INSTALLER_VERSION/aqua-installer | bash
+	echo -e "ERROR $?\n\tRequired arguments are username, hostname of the target box, this repo name. Usage example:\n\n\t$0 alik t2 mod-talos\n"
 }
 
 install_docker () { # {{{1
@@ -62,23 +57,35 @@ install_node () { # {{{1
 
 run () { # {{{1
 	echo "run $# $@"
+  if [ "$(uname)" != 'Linux' ]; then
+    local user=$1 box=$2 repo=$3
+    echo "user $user, box $box, repo $repo"
+    scp $HOME/.ssh/id_ed25519.pub $user@$box:.ssh/authorized_keys
+    scp $HOME/.ssh/id_ed25519.pub $user@$box:.ssh/id_ed25519.pub
+    scp $HOME/.ssh/id_ed25519 $user@$box:.ssh/id_ed25519
+    local cmd="chmod 600 .ssh/*;rm -rf project;mkdir -p project;cd project;git clone https://github.com/didalik/$repo.git;cd $repo;$0 $repo"
+    ssh $user@$box "$cmd"
+    return 0
+  fi
   config_git
   install_node
   setup_vim
   if [ "$USER" = 'root' ]; then
+    cd $HOME && . .profile
     mkdir -p $HOME/people/didalik
     cd $HOME/people/didalik
     install_docker
     install_go
-    install_aqua
-    which make || apt update && apt install make
+    apt update
+    which make || apt install make
     which tree || apt install tree
-    [ -d $HOME/people/didalik/mod-talos ] && return || echo 'Cloning mod-talos...'
-    git clone --recurse-submodules git@github.com:didalik/mod-talos.git
+    [ -d $HOME/people/didalik/$1 ] && return || echo 'Cloning $1...'
+    git clone --recurse-submodules git@github.com:didalik/$1.git
+  else
   else
     [ -z "$(sudo -u root cat /root/.ssh/authorized_keys)" ] && sudo cp $HOME/.ssh/authorized_keys /root/.ssh || echo '/root/.ssh/authorized_keys preserved'
     sudo [ -e /root/.ssh/id_ed25519 ] && echo 'root SSH identity preserved' || sudo cp $HOME/.ssh/id_ed25519* /root/.ssh
-    sudo -u root $0
+    sudo -u root $0 $@
   fi
 }
 
@@ -136,12 +143,15 @@ HD
 }
 
 validate () { # {{{1
-	echo "validate $# $@"
-  [ "$(uname)" = 'Linux' ] || echo -e "\n\tERROR: invalid uname: expected 'Linux', got '$(uname)'\n" && return 1
-  [ "$USER" = 'root' ] || [ -e /etc/sudoers.d/$USER ] || echo "$USER  ALL=(ALL) NOPASSWD:ALL" | sudo tee /etc/sudoers.d/$USER
-  [ -z "$SSH_CLIENT" ] || echo SSH_CLIENT $SSH_CLIENT
+	echo "$USER validate $# $@"
+  if [ "$(uname)" != 'Linux' ]; then
+    if [ $# -ne 3 ]; then
+      return 1
+    fi
+    return 0
+  fi
 }
 
-echo "$0 started for $USER on $(date) in $PWD" # {{{1
+echo "$0 started for $USER@$HOSTNAME on $(date) in $PWD" # {{{1
 validate $@ && run $@ || help $@
 echo "$0 DONE for $USER@$HOSTNAME"

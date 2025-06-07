@@ -3,29 +3,34 @@ Submodule Talos to build, deploy and test its artifacts locally.
 
 ## Getting Started
 
-1. SSH to your sudo account on your Ubuntu 24 box, then
+Here,I just reflect the steps I make - ymmv, but not much.
+
+On my Macbook Air M1 (RAM 8Gb, SSD 256Gb) with UTM, I create QEMU 7.2 Virtual Machine:
+
+- Name: `wx`,
+- Size: 192Gb,
+- Network Mode: Bridged (Advanced),
+- QEMU: Use local time for base clock,
+- Image: ubuntu-24.04.2-live-server-arm64.iso
+
+and add the following line to my `/etc/hosts` (your IP and username will differ):
 
 ```
-git clone https://github.com/didalik/mod-talos.git
-cd mod-talos
-bin/uh-setup
-vim ~/.vimrc # wait for the plugins to install
-...
-:qa
+192.168.0.193   wx      # alik
+```
+
+Having SSHed to alik@wx, I run there
+
+```
+echo 'alik ALL=(ALL) NOPASSWD:ALL' | sudo tee /etc/sudoers.d/alik
 exit
 ```
 
-2. SSH to your root account on your Ubuntu 24 box, then
+and complete the setup with
 
 ```
-vim .vimrc # wait for the plugins to install
-...
-:qa
-cd people/didalik/mod-talos
-make
+bin/uh-setup alik wx windsor-quick-start
 ```
-
-The `make` command takes time to complete.
 
 ## Work In Progress
 
