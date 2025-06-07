@@ -78,8 +78,8 @@ run () { # {{{1
     install_go
     which make || apt install make
     which tree || apt install tree
-    [ -d $HOME/people/didalik/$1 ] && return || echo 'Cloning $1...'
-    git clone --recurse-submodules git@github.com:didalik/$1.git
+    [ -d $HOME/people/didalik/$1 ] && return || echo "Cloning $1..."
+    git clone --recurse-submodules git@github.com:didalik/$1.git # TODO handle msg The authenticity of host 'github.com (140.82.114.4)' can't be established.
   else
     [ -z "$(sudo -u root cat /root/.ssh/authorized_keys)" ] && sudo cp $HOME/.ssh/authorized_keys /root/.ssh || echo '/root/.ssh/authorized_keys preserved'
     sudo [ -e /root/.ssh/id_ed25519 ] && echo 'root SSH identity preserved' || sudo cp $HOME/.ssh/id_ed25519* /root/.ssh
