@@ -38,6 +38,7 @@ History so far:
 
 ```
 git submodule add https://github.com/siderolabs/talos.git
+git submodule add https://github.com/siderolabs/pkgs.git
 curl -sSfL https://raw.githubusercontent.com/aquaproj/aqua-installer/v3.1.2/aqua-installer | bash
 ```
 

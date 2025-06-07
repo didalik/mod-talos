@@ -4,3 +4,6 @@
 [submodule "dak.org.hub"]
 	path = dak.org.hub
 	url = git@github.com:didalik/dak.org.hub.git
+[submodule "pkgs"]
+	path = pkgs
+	url = https://github.com/siderolabs/pkgs.git
