@@ -68,7 +68,7 @@ run () { # {{{1
     return 0
   fi
   config_git
-  install_node
+  install_node # TODO no root, sudo ln -s $HOME/.nvm/versions/node/v20.19.2/bin/{node,npm} /usr/local/bin/{node,npm}
   setup_vim
   if [ "$USER" = 'root' ]; then
     cd $HOME && . .profile
